@@ -20,7 +20,7 @@ def home():
 
 # Handle the HTTP POST request to add a product
 @app.route('/products', methods=['POST'])
-def addProduct():
+def addProduct(name,price,quantity):
     products = db['products']
     name = request.form['name']
     price = request.form['price']
@@ -41,6 +41,26 @@ def addProduct():
     else:
         # If any required field is missing, return a 404 error
         return notFound()
+    
+def addProducts(name,price,quantity):
+    products = db['products']
+
+    # Check if all required fields are filled
+    if name and price and quantity:
+        product = Product(name, price, quantity)
+        # Insert the product into the collection
+        products.insert_one(product.toDBCollection())
+        response = jsonify({
+            'name' : name,
+            'price' : price,
+            'quantity' : quantity
+        })
+        # Redirect the user to the home page
+        return redirect(url_for('home'))
+    else:
+        # If any required field is missing, return a 404 error
+        return notFound()
+        
 
 # Handle the HTTP DELETE request to remove a product
 @app.route('/delete/<string:product_name>')
@@ -89,3 +109,6 @@ def notFound(error=None):
 # Run the application on the specified port with debug mode enabled
 if __name__ == '__main__':
     app.run(debug=True, port=4000)
+
+def helloworld():
+    return "hello-world"
